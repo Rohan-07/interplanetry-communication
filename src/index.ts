@@ -1,10 +1,21 @@
-import { decodeMessage, encodeMessage } from "./utils/translation";
+import express from "express";
+import bodyParser from "body-parser";
+import { messageController } from "./controllers/messageController";
+import { messageLogger } from "./middlewares/messageLogger";
+import { messageIntercept } from "./intercepts/messageIntercept";
 
-console.log("Initializing the Earth-Mars communication");
+const app = express();
+const port = 3000;
+console.info("Initializing Earth-Mars communication");
 
-const message1 = "houston do you copy";
-const encodedMessage = encodeMessage(message1);
-const decodedMessage = decodeMessage(encodedMessage);
+app.use(bodyParser.json());
+app.use(messageLogger);
+app.use(messageIntercept);
 
-console.log(encodedMessage);
-console.log(decodedMessage);
+app.post("/api/earth-mars-comm/message", messageController);
+
+app.listen(port, () => {
+	console.info(
+		`Earth-Mars 🌍 communication established at \nhttp://localhost:${port}`
+	);
+});
